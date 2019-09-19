@@ -1,13 +1,14 @@
-# sdb
-simple database client wrapper for mongo, sql, or kv store.
+package tests
 
-封装常用的数据库操作Insert,Delete,Update,Query,Index操作,以保障不同的底层引擎对相同的操作会有一致的行为  
-目前主要封装了三种数据库,mongo,sql,bolt，bolt并没有索引，完全是暴力全遍历查询，只能用作本地测试使用，API设计上主要向mongo靠近
+import (
+	"encoding/json"
+	"fmt"
+	"testing"
+	"time"
 
-目前仅仅是粗略的实现了一下，还没有细致的测试
-
-用法:
-```go
+	"github.com/jeckbjy/sdb"
+	"github.com/jeckbjy/sdb/engine/bolt"
+)
 
 type Foo struct {
 	ID        string    `bson:"_id" json:"_id"`
@@ -48,7 +49,6 @@ func TestClient(t *testing.T) {
 	}
 }
 
-// 分页查询
 func TestQuery(t *testing.T) {
 	bolt.Register()
 	c, err := sdb.New("")
@@ -79,4 +79,11 @@ func TestQuery(t *testing.T) {
 	}
 	t.Log(page)
 }
-```
+
+func TestJson(t *testing.T) {
+	f := Foo{ID: "_id", Name: "name", CreatedAt: time.Now()}
+	d, _ := json.Marshal(f)
+	j := make(map[string]interface{})
+	_ = json.Unmarshal(d, &j)
+	t.Log(j)
+}
